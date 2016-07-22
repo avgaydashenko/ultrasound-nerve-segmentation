@@ -1,3 +1,4 @@
+__author__ = 'alex'
 
 # coding: utf-8
 
@@ -22,7 +23,7 @@ with open("train_masks.csv") as train_masks:
     for row in reader:
         # dictionary will contain answer for each file from directory "train"
         answers[str(row[0]) + "_" + str(row[1]) + ".tif"] = row[2]
-        
+
 print("answers")
 
 
@@ -54,12 +55,17 @@ print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 test = []
 test_filenames = []
 
-for filename in listdir("new_test/"):
-    image_array = np.array(Image.open('new_test/' + filename))
-    image_array = image_array.flatten()
-    image_array = image_array.astype(int)
-    test.append(list(image_array))
-    test_filenames.append(file)
+with open("sort_order_of_train.csv") as train_masks:
+    num_of_line = -1
+    for line in train_masks: # getting names of files from directory "train" in str
+        num_of_line += 1
+        if (num_of_line % 1001 == 0):
+            file = "new_train/" + line[:-1]
+            image_array = np.array(Image.open(file))
+            image_array = image_array.flatten()
+            image_array = image_array.astype(int)
+            test.append(list(image_array))
+            test_filenames.append(file)
 
 print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 print("test")
@@ -99,11 +105,10 @@ print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 result = []
 for i in np.arange(len(test_filenames)):
     a = re.findall('\d+', test_filenames[i])
-    sum = 0
-    j = -1
+    sum = ''
     for x in a:
-        j += 1
-        sum = int(x) + sum * (100 ** j)
+        sum += '_' + x
+    sum = sum[1:]
     print(test_filenames[i], str(sum))
     row = [sum, answers[train_filenames[indeces[i]]]]
     result.append(row)
@@ -115,11 +120,11 @@ print("result")
 
 # In[24]:
 
-with open("submission.csv", "w") as submission:
+with open("submission_validate.csv", "w+") as submission:
     writer = csv.writer(submission)
     writer.writerow(['img', 'pixels'])
     writer.writerows(result)
-    
+
 print("done")
 
 

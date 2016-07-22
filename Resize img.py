@@ -6,6 +6,6 @@ from os import listdir
 from scipy import spatial
 
 for f in listdir('train_/'):
-    img =Image.open('test/'+f)
+    img =Image.open('train/'+f)
     img.resize((145, 105), Image.ANTIALIAS)
     img.save("new_test/"+f, optimaze = True, quality = 95)
